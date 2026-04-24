@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="BookService 单元测试" tests="17" skipped="0" failures="0" errors="0" timestamp="2026-04-24T09:11:12.103Z" hostname="DESKTOP-TJERQRA" time="0.774">
+  <properties/>
+  <testcase name="查询所有图书 - 返回正常列表" classname="com.kyk.librarymanagement.service.BookServiceTest" time="0.568"/>
+  <testcase name="归还图书 - 图书未借出" classname="com.kyk.librarymanagement.service.BookServiceTest" time="0.034"/>
+  <testcase name="查询单个图书 - 成功" classname="com.kyk.librarymanagement.service.BookServiceTest" time="0.012"/>
+  <testcase name="借阅图书 - 用户不存在" classname="com.kyk.librarymanagement.service.BookServiceTest" time="0.012"/>
+  <testcase name="删除图书 - 图书不存在" classname="com.kyk.librarymanagement.service.BookServiceTest" time="0.012"/>
+  <testcase name="创建图书 - 成功" classname="com.kyk.librarymanagement.service.BookServiceTest" time="0.014"/>
+  <testcase name="归还图书 - 图书不存在" classname="com.kyk.librarymanagement.service.BookServiceTest" time="0.009"/>
+  <testcase name="借阅图书 - 成功" classname="com.kyk.librarymanagement.service.BookServiceTest" time="0.011"/>
+  <testcase name="查询单个图书 - 图书不存在" classname="com.kyk.librarymanagement.service.BookServiceTest" time="0.007"/>
+  <testcase name="查询所有图书 - 返回空列表" classname="com.kyk.librarymanagement.service.BookServiceTest" time="0.007"/>
+  <testcase name="删除图书 - 成功" classname="com.kyk.librarymanagement.service.BookServiceTest" time="0.007"/>
+  <testcase name="归还图书 - 成功" classname="com.kyk.librarymanagement.service.BookServiceTest" time="0.01"/>
+  <testcase name="更新图书 - 成功" classname="com.kyk.librarymanagement.service.BookServiceTest" time="0.01"/>
+  <testcase name="借阅图书 - 图书已借出" classname="com.kyk.librarymanagement.service.BookServiceTest" time="0.009"/>
+  <testcase name="借阅图书 - 图书不存在" classname="com.kyk.librarymanagement.service.BookServiceTest" time="0.009"/>
+  <testcase name="归还图书 - 用户不存在" classname="com.kyk.librarymanagement.service.BookServiceTest" time="0.01"/>
+  <testcase name="更新图书 - 图书不存在" classname="com.kyk.librarymanagement.service.BookServiceTest" time="0.008"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
