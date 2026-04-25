@@ -9,18 +9,19 @@ public class User {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
     
-    @Column(nullable = false, length = 50)
+    @Column(name = "name", nullable = false, length = 50)
     private String name;
     
-    @Column(nullable = false, unique = true, length = 20)
+    @Column(name = "phone", nullable = false, unique = true, length = 20)
     private String phone;
     
-    @Column(nullable = false)
+    @Column(name = "password", nullable = false, length = 255)
     private String password;
     
-    @Column(name = "created_at")
+    @Column(name = "created_at", columnDefinition = "DATETIME")
     private LocalDateTime createdAt;
     
     @PrePersist

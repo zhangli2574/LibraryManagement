@@ -12,6 +12,7 @@ public class BorrowRecord {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     @Schema(description = "记录ID")
     private Long id;
     
@@ -20,15 +21,15 @@ public class BorrowRecord {
     private Long bookId;
     
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "fk_borrow_user"))
     @JsonIgnoreProperties({"password", "createdAt"})
     @Schema(description = "借阅用户")
     private User user;
     
-    @Column(name = "borrow_time", nullable = false)
+    @Column(name = "borrow_time", nullable = false, columnDefinition = "DATETIME")
     private LocalDateTime borrowTime;
     
-    @Column(name = "return_time")
+    @Column(name = "return_time", columnDefinition = "DATETIME")
     private LocalDateTime returnTime;
     
     @PrePersist

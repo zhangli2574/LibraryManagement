@@ -1,28 +1,41 @@
 # 开发环境配置
 
-# 数据源配置
+# 数据源配置（MySQL 8.0）
 spring:
   datasource:
-    url: jdbc:h2:mem:librarydb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: 
+    url: jdbc:mysql://localhost:3306/library?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: Zl@7573920
+  
+  # Redis 配置
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: Zl@7573920
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
   
   # JPA 配置
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
-      ddl-auto: create-drop  # 开发环境：每次启动重新建表
+      ddl-auto: update  # 自动创建/更新表结构
     show-sql: true           # 显示 SQL 语句
     properties:
       hibernate:
         format_sql: true     # 格式化 SQL
   
-  # H2 Console 配置（仅开发环境）
+  # H2 Console（开发环境禁用，使用 MySQL）
   h2:
     console:
-      enabled: true
-      path: /h2-console
+      enabled: false
 
 # 日志配置
 logging:
@@ -37,5 +50,5 @@ logging:
 
 # JWT 配置（开发环境）
 jwt:
-  secret: dev-secret-key-for-library-management-system-2026
-  expiration: 86400000  # 24小时（毫秒）
+  secret: ZGV2LXNlY3JldC1rZXktZm9yLWxpYnJhcnktbWFuYWdlbWVudC1zeXN0ZW0tMjAyNg==
+  expiration: 604800000  # 7天（毫秒）

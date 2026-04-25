@@ -8,6 +8,20 @@ spring:
     username: root
     password: your_secure_password
   
+  # Redis 配置
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 16
+          max-idle: 16
+          min-idle: 4
+          max-wait: -1ms
+  
   # JPA 配置
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
@@ -39,8 +53,8 @@ logging:
 
 # JWT 配置（生产环境）
 jwt:
-  secret: ${JWT_SECRET:prod-secure-secret-key-for-library-management-system-2026-change-me}  # 从环境变量读取
-  expiration: 3600000  # 1小时（毫秒）
+  secret: ${JWT_SECRET:cHJvZC1zZWN1cmUtc2VjcmV0LWtleS1mb3ItbGlicmFyeS1tYW5hZ2VtZW50LXN5c3RlbS0yMDI2}  # 从环境变量读取，默认使用 Base64 编码的 Secret
+  expiration: 604800000  # 7天（毫秒）
 
 # 服务器配置
 server:

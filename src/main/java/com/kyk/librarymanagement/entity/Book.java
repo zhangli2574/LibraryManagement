@@ -9,21 +9,22 @@ public class Book {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
     
-    @Column(nullable = false)
+    @Column(name = "title", nullable = false, length = 200)
     private String title;
     
-    @Column(nullable = false)
+    @Column(name = "author", nullable = false, length = 100)
     private String author;
     
-    @Column(nullable = false)
+    @Column(name = "is_borrowed", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
     private Boolean isBorrowed = false;
     
-    @Column(name = "created_at")
+    @Column(name = "created_at", columnDefinition = "DATETIME")
     private LocalDateTime createdAt;
     
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", columnDefinition = "DATETIME")
     private LocalDateTime updatedAt;
     
     @PrePersist
