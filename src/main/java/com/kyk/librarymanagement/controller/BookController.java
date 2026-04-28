@@ -3,6 +3,7 @@ package com.kyk.librarymanagement.controller;
 import com.kyk.librarymanagement.dto.ApiResponse;
 import com.kyk.librarymanagement.dto.BookRequest;
 import com.kyk.librarymanagement.dto.BorrowRequest;
+import com.kyk.librarymanagement.dto.BorrowerInfoDTO;
 import com.kyk.librarymanagement.dto.PageResponse;
 import com.kyk.librarymanagement.dto.PopularBookDTO;
 import com.kyk.librarymanagement.entity.Book;
@@ -50,6 +51,14 @@ public class BookController {
             @PathVariable Long id) {
         bookService.deleteBook(id);
         return ResponseEntity.ok(ApiResponse.success("图书删除成功", null));
+    }
+    
+    // 批量删除图书
+    @Operation(summary = "批量删除图书", description = "批量删除多个图书")
+    @DeleteMapping("/batch")
+    public ResponseEntity<ApiResponse<Void>> batchDeleteBooks(@RequestBody List<Long> ids) {
+        bookService.batchDeleteBooks(ids);
+        return ResponseEntity.ok(ApiResponse.success("批量删除成功", null));
     }
     
     // 更新图书
@@ -148,5 +157,15 @@ public class BookController {
             @RequestParam(defaultValue = "10") int limit) {
         List<PopularBookDTO> popularBooks = bookService.getPopularBooks(limit);
         return ResponseEntity.ok(ApiResponse.success(popularBooks));
+    }
+    
+    // 查询当前借阅人信息
+    @Operation(summary = "查询当前借阅人信息", description = "根据图书ID查询当前正在借阅该图书的用户信息（未归还）")
+    @GetMapping("/{bookId}/borrower-info")
+    public ResponseEntity<ApiResponse<BorrowerInfoDTO>> getBorrowerInfo(
+            @Parameter(description = "图书ID", required = true, example = "1") 
+            @PathVariable Long bookId) {
+        BorrowerInfoDTO borrowerInfo = borrowRecordService.getBorrowerInfoByBookId(bookId);
+        return ResponseEntity.ok(ApiResponse.success(borrowerInfo));
     }
 }

@@ -23,6 +23,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/api/users/login",      // 放行登录接口
                         "/api/users/register",   // 放行注册接口
+                        "/api/admin/login",      // 放行管理员登录接口
                         "/swagger-ui/**",        // 放行 Swagger UI
                         "/swagger-ui.html",      // 放行 Swagger UI 主页
                         "/v3/api-docs/**",       // 放行 API 文档

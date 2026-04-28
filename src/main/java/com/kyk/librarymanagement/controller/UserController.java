@@ -50,6 +50,14 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success("用户删除成功", null));
     }
     
+    // 批量删除用户
+    @Operation(summary = "批量删除用户", description = "批量删除多个用户")
+    @DeleteMapping("/batch")
+    public ResponseEntity<ApiResponse<Void>> batchDeleteUsers(@RequestBody List<Long> ids) {
+        userService.batchDeleteUsers(ids);
+        return ResponseEntity.ok(ApiResponse.success("批量删除成功", null));
+    }
+    
     // 更新用户
     @Operation(summary = "更新用户", description = "根据ID更新用户信息")
     @PutMapping("/{id}")

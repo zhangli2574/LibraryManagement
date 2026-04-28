@@ -19,13 +19,23 @@ public interface BorrowRecordRepository extends JpaRepository<BorrowRecord, Long
     List<BorrowRecord> findByBookIdOrderByBorrowTimeDesc(Long bookId);
     
     // 查询热门图书（借阅次数最多的前 N 本，只统计已归还的记录）
-    @Query(value = "SELECT b.id, b.title, COUNT(br.id) as borrow_count " +
+    @Query(value = "SELECT b.id, b.title, b.author, b.is_borrowed, b.created_at, b.updated_at, " +
+                   "COUNT(br.id) as borrow_count " +
                    "FROM borrow_records br " +
                    "JOIN books b ON br.book_id = b.id " +
                    "WHERE br.return_time IS NOT NULL " +
-                   "GROUP BY b.id, b.title " +
+                   "GROUP BY b.id, b.title, b.author, b.is_borrowed, b.created_at, b.updated_at " +
                    "ORDER BY borrow_count DESC " +
                    "LIMIT :limit",
            nativeQuery = true)
     List<Object[]> findTopBorrowedBooks(@Param("limit") int limit);
+    
+    // 查询当前正在借阅的记录（未归还）
+    BorrowRecord findByBookIdAndReturnTimeIsNull(Long bookId);
+    
+    // 根据用户ID删除所有借阅记录（用于删除用户时级联删除）
+    void deleteByUserId(Long userId);
+
+    // 根据图书ID删除所有借阅记录（用于删除图书时级联删除）
+    void deleteByBookId(Long bookId);
 }

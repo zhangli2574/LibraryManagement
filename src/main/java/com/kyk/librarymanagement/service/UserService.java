@@ -6,6 +6,7 @@ import com.kyk.librarymanagement.dto.UserRequest;
 import com.kyk.librarymanagement.entity.User;
 import com.kyk.librarymanagement.exception.BusinessException;
 import com.kyk.librarymanagement.exception.ResourceNotFoundException;
+import com.kyk.librarymanagement.repository.BorrowRecordRepository;
 import com.kyk.librarymanagement.repository.UserRepository;
 import com.kyk.librarymanagement.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -25,6 +27,9 @@ public class UserService {
     
     @Autowired
     private JwtUtil jwtUtil;
+    
+    @Autowired
+    private BorrowRecordRepository borrowRecordRepository;
     
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     
@@ -44,11 +49,35 @@ public class UserService {
     }
     
     // 删除用户
+    @Transactional
     @CacheEvict(value = "users", key = "#id")
     public void deleteUser(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("用户不存在，ID: " + id));
+        
+        // 先删除该用户的所有借阅记录（解除外键约束）
+        borrowRecordRepository.deleteByUserId(id);
+        
+        // 再删除用户
         userRepository.delete(user);
+    }
+    
+    // 批量删除用户
+    @Transactional
+    @CacheEvict(value = "users", allEntries = true)
+    public void batchDeleteUsers(List<Long> ids) {
+        List<User> users = userRepository.findAllById(ids);
+        if (users.size() != ids.size()) {
+            throw new ResourceNotFoundException("部分用户不存在");
+        }
+        
+        // 先删除这些用户的所有借阅记录（解除外键约束）
+        for (Long userId : ids) {
+            borrowRecordRepository.deleteByUserId(userId);
+        }
+        
+        // 再批量删除用户
+        userRepository.deleteAll(users);
     }
     
     // 更新用户
@@ -57,8 +86,13 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("用户不存在，ID: " + id));
         
-        user.setName(userRequest.getName());
-        user.setPhone(userRequest.getPhone());
+        // 只更新非空字段
+        if (userRequest.getName() != null && !userRequest.getName().isEmpty()) {
+            user.setName(userRequest.getName());
+        }
+        if (userRequest.getPhone() != null && !userRequest.getPhone().isEmpty()) {
+            user.setPhone(userRequest.getPhone());
+        }
         if (userRequest.getPassword() != null && !userRequest.getPassword().isEmpty()) {
             user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
         }
@@ -89,8 +123,8 @@ public class UserService {
             throw new BusinessException("手机号或密码错误");
         }
         
-        // 生成 JWT Token
-        String token = jwtUtil.generateToken(user.getId(), user.getPhone());
+        // 生成 JWT Token（添加用户类型标识）
+        String token = jwtUtil.generateToken(user.getId(), user.getPhone(), "USER");
         
         // 返回登录响应
         LoginResponse response = new LoginResponse();

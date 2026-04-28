@@ -19,17 +19,43 @@ public class JwtUtil {
     
     /**
      * 生成 JWT Token
+     * @param userId 用户ID
+     * @param phone 手机号
+     * @param userType 用户类型（USER 或 ADMIN）
      */
-    public String generateToken(Long userId, String phone) {
+    public String generateToken(Long userId, String phone, String userType) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("phone", phone);
+        claims.put("userType", userType);
         
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(userId.toString())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtConfig.getExpiration()))
+                .signWith(SignatureAlgorithm.HS256, jwtConfig.getSecret())
+                .compact();
+    }
+    
+    /**
+     * 生成 JWT Token（自定义过期时间）
+     * @param userId 用户ID
+     * @param phone 手机号
+     * @param userType 用户类型（USER 或 ADMIN）
+     * @param expirySeconds 过期时间（秒）
+     */
+    public String generateTokenWithExpiry(Long userId, String phone, String userType, long expirySeconds) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userId);
+        claims.put("phone", phone);
+        claims.put("userType", userType);
+        
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(userId.toString())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expirySeconds * 1000))
                 .signWith(SignatureAlgorithm.HS256, jwtConfig.getSecret())
                 .compact();
     }
@@ -66,5 +92,16 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody();
         return claims.get("phone", String.class);
+    }
+    
+    /**
+     * 从 Token 中获取用户类型
+     */
+    public String getUserTypeFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(jwtConfig.getSecret())
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.get("userType", String.class);
     }
 }

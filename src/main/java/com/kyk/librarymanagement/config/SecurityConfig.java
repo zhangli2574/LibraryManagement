@@ -24,6 +24,8 @@ public class SecurityConfig {
                     "/v3/api-docs/**",
                     "/webjars/**"
                 ).permitAll()
+                // 放行管理员登录接口
+                .requestMatchers("/api/admin/login").permitAll()
                 // 允许所有其他请求公开访问
                 .anyRequest().permitAll()
             );

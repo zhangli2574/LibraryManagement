@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,11 +41,35 @@ public class BookService {
     }
         
     // 删除图书
+    @Transactional
     @CacheEvict(value = "books", key = "#id")
     public void deleteBook(Long id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("图书不存在，ID: " + id));
+        
+        // 先删除该图书的所有借阅记录（解除外键约束）
+        borrowRecordRepository.deleteByBookId(id);
+        
+        // 再删除图书
         bookRepository.delete(book);
+    }
+    
+    // 批量删除图书
+    @Transactional
+    @CacheEvict(value = "books", allEntries = true)
+    public void batchDeleteBooks(List<Long> ids) {
+        List<Book> books = bookRepository.findAllById(ids);
+        if (books.size() != ids.size()) {
+            throw new ResourceNotFoundException("部分图书不存在");
+        }
+        
+        // 先删除这些图书的所有借阅记录（解除外键约束）
+        for (Long bookId : ids) {
+            borrowRecordRepository.deleteByBookId(bookId);
+        }
+        
+        // 再批量删除图书
+        bookRepository.deleteAll(books);
     }
         
     // 更新图书
@@ -126,11 +151,37 @@ public class BookService {
         List<Object[]> results = borrowRecordRepository.findTopBorrowedBooks(limit);
             
         return results.stream()
-                .map(row -> new PopularBookDTO(
-                        ((Number) row[0]).longValue(),  // id
-                        (String) row[1],                 // title
-                        ((Number) row[2]).intValue()     // borrowCount
-                ))
+                .map(row -> {
+                    // 处理时间戳转换
+                    LocalDateTime createdAt = null;
+                    LocalDateTime updatedAt = null;
+                    
+                    if (row[4] != null) {
+                        if (row[4] instanceof java.sql.Timestamp) {
+                            createdAt = ((java.sql.Timestamp) row[4]).toLocalDateTime();
+                        } else if (row[4] instanceof LocalDateTime) {
+                            createdAt = (LocalDateTime) row[4];
+                        }
+                    }
+                    
+                    if (row[5] != null) {
+                        if (row[5] instanceof java.sql.Timestamp) {
+                            updatedAt = ((java.sql.Timestamp) row[5]).toLocalDateTime();
+                        } else if (row[5] instanceof LocalDateTime) {
+                            updatedAt = (LocalDateTime) row[5];
+                        }
+                    }
+                    
+                    return new PopularBookDTO(
+                            ((Number) row[0]).longValue(),                    // id
+                            (String) row[1],                                   // title
+                            (String) row[2],                                   // author
+                            row[3] instanceof Boolean ? (Boolean) row[3] : ((Number) row[3]).intValue() == 1,  // isBorrowed
+                            createdAt,                                         // createdAt
+                            updatedAt,                                         // updatedAt
+                            ((Number) row[6]).intValue()                      // borrowCount
+                    );
+                })
                 .collect(Collectors.toList());
     }
 }

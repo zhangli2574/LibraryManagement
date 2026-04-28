@@ -1,5 +1,6 @@
 package com.kyk.librarymanagement.service;
 
+import com.kyk.librarymanagement.dto.BorrowerInfoDTO;
 import com.kyk.librarymanagement.entity.BorrowRecord;
 import com.kyk.librarymanagement.entity.User;
 import com.kyk.librarymanagement.exception.BusinessException;
@@ -47,5 +48,23 @@ public class BorrowRecordService {
     // 查询某图书的借阅记录（分页）
     public Page<BorrowRecord> getBorrowRecordsByBookId(Long bookId, Pageable pageable) {
         return borrowRecordRepository.findByBookIdOrderByBorrowTimeDesc(bookId, pageable);
+    }
+    
+    // 查询当前正在借阅的记录（未归还）并返回借阅人信息
+    public BorrowerInfoDTO getBorrowerInfoByBookId(Long bookId) {
+        BorrowRecord record = borrowRecordRepository.findByBookIdAndReturnTimeIsNull(bookId);
+        
+        if (record == null) {
+            throw new BusinessException("该图书当前没有被借阅");
+        }
+        
+        User user = record.getUser();
+        return new BorrowerInfoDTO(
+                record.getId(),
+                record.getBookId(),
+                user.getId(),
+                user.getPhone(),
+                user.getName()
+        );
     }
 }
